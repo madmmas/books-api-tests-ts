@@ -16,12 +16,10 @@ import { expect, test } from "../fixtures.js";
 test.describe("Login contract", () => {
   test("API-CONTRACT-01 the request this suite sends matches CredentialsBody", async ({ auth }) => {
     // Arrange
-    const altcha = await auth.freshCaptcha();
-    const body = {
+    const body = await auth.withCaptcha({
       username: config.buyer.username,
       password: config.buyer.password,
-      altcha,
-    };
+    });
 
     // Act
     const errors = validateRequestBody(ENDPOINTS.jwtLogin, "post", body);

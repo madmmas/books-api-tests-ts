@@ -1,5 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 import { solveCaptcha } from "../altcha.js";
+import { config } from "../config.js";
 import { ENDPOINTS } from "../constants.js";
 
 /**
@@ -21,7 +22,10 @@ export interface ApiResult<T = unknown> {
 }
 
 export interface LoginOptions {
-  /** false sends no altcha field at all. Default: solve and send one. */
+  /**
+   * false sends no altcha field at all.
+   * Default: solve and send one, but only when ALTCHA_ENABLED is true.
+   */
   captcha?: boolean;
   /** Use this exact altcha value instead of solving a fresh challenge. */
   altcha?: string;
@@ -36,7 +40,7 @@ export class AuthClient {
 
     if (options.altcha !== undefined) {
       data.altcha = options.altcha;
-    } else if (options.captcha !== false) {
+    } else if (options.captcha !== false && config.altchaEnabled) {
       data.altcha = await solveCaptcha(this.ctx);
     }
 
@@ -58,6 +62,15 @@ export class AuthClient {
       body: (await res.json().catch(() => ({}))) as unknown,
       ms,
     };
+  }
+
+  /**
+   * Adds a solved captcha to a request body when ALTCHA is enabled.
+   * Otherwise returns the body unchanged so callers do not branch.
+   */
+  async withCaptcha(body: Record<string, unknown>): Promise<Record<string, unknown>> {
+    if (!config.altchaEnabled) return body;
+    return { ...body, altcha: await solveCaptcha(this.ctx) };
   }
 
   /** Solves a captcha without sending it, for replay and reuse cases. */

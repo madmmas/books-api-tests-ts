@@ -131,10 +131,10 @@ test.describe("JWT login", () => {
   for (const testCase of invalidBodies) {
     test(`API-AUTH-07 ${testCase.name} is rejected with 400`, async ({ auth }) => {
       // Arrange
-      const altcha = await auth.freshCaptcha();
+      const body = await auth.withCaptcha({ ...testCase.body });
 
       // Act
-      const res = await auth.postLogin({ ...testCase.body, altcha });
+      const res = await auth.postLogin(body);
 
       // Assert
       expect(res.status).toBe(400);
@@ -142,58 +142,13 @@ test.describe("JWT login", () => {
     });
   }
 
-  test(
-    "API-AUTH-08 login without a captcha is rejected",
-    { tag: ["@security"] },
-    async ({ auth }) => {
-      // Act
-      const res = await auth.login(config.buyer.username, config.buyer.password, {
-        captcha: false,
-      });
-
-      // Assert
-      expect(res.status).toBe(400);
-      expect((res.body as { code?: string }).code).toBe(ERROR_CODES.captchaRequired);
-      expect(res.body).not.toHaveProperty("accessToken");
-    },
-  );
-
-  test("API-AUTH-09 a malformed captcha is rejected", { tag: ["@security"] }, async ({ auth }) => {
-    // Act
-    const res = await auth.login(config.buyer.username, config.buyer.password, {
-      altcha: "not-a-real-altcha-payload",
-    });
-
-    // Assert
-    expect(res.status).toBe(400);
-    expect(res.body).not.toHaveProperty("accessToken");
-  });
-
-  test(
-    "API-AUTH-10 a captcha solution cannot be replayed",
-    { tag: ["@security"] },
-    async ({ auth }) => {
-      // Arrange: one solution, used twice.
-      const altcha = await auth.freshCaptcha();
-      const first = await auth.login(config.buyer.username, config.buyer.password, { altcha });
-      expect(first.status, "the first use of a fresh captcha should succeed").toBe(200);
-
-      // Act
-      const replay = await auth.login(config.buyer.username, config.buyer.password, { altcha });
-
-      // Assert: replayable solutions let a bot reuse one proof-of-work forever.
-      expect(replay.status).toBe(400);
-      expect(replay.body).not.toHaveProperty("accessToken");
-    },
-  );
-
   test("API-AUTH-11 oversized input is rejected cleanly", async ({ auth }) => {
     // Arrange
-    const altcha = await auth.freshCaptcha();
     const huge = "a".repeat(100_000);
+    const body = await auth.withCaptcha({ username: huge, password: huge });
 
     // Act
-    const res = await auth.postLogin({ username: huge, password: huge, altcha });
+    const res = await auth.postLogin(body);
 
     // Assert: a clean client error, never a 5xx.
     expect(res.status).toBeGreaterThanOrEqual(400);

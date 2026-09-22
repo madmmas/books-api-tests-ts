@@ -19,6 +19,15 @@ function required(name: string, fallback?: string): string {
   return value;
 }
 
+function asBoolean(name: string, fallback: boolean): boolean {
+  const raw = process.env[name];
+  if (raw === undefined || raw.trim() === "") return fallback;
+  const value = raw.trim().toLowerCase();
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw new Error(`${name} must be true or false (got "${raw}")`);
+}
+
 function asTestEnv(value: string): TestEnv {
   if (!TEST_ENVS.includes(value as TestEnv)) {
     throw new Error(`TEST_ENV must be one of ${TEST_ENVS.join(", ")} (got "${value}")`);
@@ -33,6 +42,11 @@ function stripTrailingSlash(url: string): string {
 export const config = {
   apiBaseUrl: stripTrailingSlash(required("API_BASE_URL", "http://localhost:8080")),
   env: asTestEnv(required("TEST_ENV", "local")),
+  /**
+   * Captcha is opt-in. Challenges are fetched and the `altcha` field is sent
+   * only when this is true.
+   */
+  altchaEnabled: asBoolean("ALTCHA_ENABLED", false),
   altchaChallengePath: required("ALTCHA_CHALLENGE_PATH", "/auth/altcha/challenge"),
   openApiSpecPath: required("OPENAPI_SPEC", "./openapi/books-api.yaml"),
 

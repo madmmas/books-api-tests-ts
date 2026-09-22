@@ -39,6 +39,7 @@ jobs:
       TEST_ENV: ci
       BUYER_USERNAME: ${{ secrets.BUYER_USERNAME }}
       BUYER_PASSWORD: ${{ secrets.BUYER_PASSWORD }}
+      ALTCHA_ENABLED: ${{ vars.ALTCHA_ENABLED }}
       ALTCHA_CHALLENGE_PATH: ${{ vars.ALTCHA_CHALLENGE_PATH }}
       OPENAPI_SPEC: ./openapi/books-api.yaml
     steps:

@@ -5,8 +5,9 @@ import { config } from "./config.js";
 /**
  * ALTCHA proof-of-work helper.
  *
- * The widget fetches a challenge, finds the number whose hash matches, and
- * submits a base64 payload. Tests do the same thing headlessly.
+ * Used only when ALTCHA_ENABLED is true. The widget fetches a challenge, finds
+ * the number whose hash matches, and submits a base64 payload. Tests do the
+ * same thing headlessly.
  *
  * NOTE: the challenge path is not in the published OpenAPI spec. It is set via
  * ALTCHA_CHALLENGE_PATH and must be confirmed with the backend team.
@@ -70,6 +71,9 @@ export function encodeSolution(challenge: AltchaChallenge, number: number): stri
  * Belongs in the Arrange phase: solve first, then act.
  */
 export async function solveCaptcha(ctx: APIRequestContext): Promise<string> {
+  if (!config.altchaEnabled) {
+    throw new Error("solveCaptcha() requires ALTCHA_ENABLED=true");
+  }
   const challenge = await fetchChallenge(ctx);
   return encodeSolution(challenge, solveChallenge(challenge));
 }

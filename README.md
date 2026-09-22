@@ -38,7 +38,14 @@ before a real environment is available:
 
 ```bash
 npm run mock-api &      # listens on http://localhost:8080
-npm test
+npm test                # captcha tests run only when ALTCHA_ENABLED=true
+```
+
+To exercise captcha against the mock, start both sides with the flag on:
+
+```bash
+ALTCHA_ENABLED=true npm run mock-api &
+ALTCHA_ENABLED=true npm test
 ```
 
 **A green run against the mock proves the harness works and nothing about the
@@ -47,15 +54,15 @@ never uses the mock.
 
 ## What is covered
 
-| Area                   | Tests                   | Notes                                                    |
-| ---------------------- | ----------------------- | -------------------------------------------------------- |
-| Health                 | `API-HEALTH-01..03`     | Status, latency, no caching                              |
-| JWT login, happy path  | `API-AUTH-01..03`       | Token pair, JWT claims, `Cache-Control: no-store`        |
-| JWT login, credentials | `API-AUTH-04..06`       | 401 shape, user enumeration, no attempt counter          |
-| JWT login, validation  | `API-AUTH-07` (6 cases) | Missing, empty and wrong-typed fields                    |
-| JWT login, captcha     | `API-AUTH-08..10`       | Missing, malformed, replayed                             |
-| JWT login, robustness  | `API-AUTH-11..12`       | Oversized input, unusual usernames                       |
-| Contract               | `API-CONTRACT-01..05`   | Request bodies and status codes against the OpenAPI spec |
+| Area                   | Tests                   | Notes                                                                   |
+| ---------------------- | ----------------------- | ----------------------------------------------------------------------- |
+| Health                 | `API-HEALTH-01..03`     | Status, latency, no caching                                             |
+| JWT login, happy path  | `API-AUTH-01..03`       | Token pair, JWT claims, `Cache-Control: no-store`                       |
+| JWT login, credentials | `API-AUTH-04..06`       | 401 shape, user enumeration, no attempt counter                         |
+| JWT login, validation  | `API-AUTH-07` (6 cases) | Missing, empty and wrong-typed fields                                   |
+| JWT login, captcha     | `API-AUTH-08..10`       | Missing, malformed, replayed. Collected only when `ALTCHA_ENABLED=true` |
+| JWT login, robustness  | `API-AUTH-11..12`       | Oversized input, unusual usernames                                      |
+| Contract               | `API-CONTRACT-01..05`   | Request bodies and status codes against the OpenAPI spec                |
 
 Run a slice:
 
@@ -149,3 +156,6 @@ Each is visible in the suite rather than worked around.
 See `.env.example`. `API_BASE_URL`, `BUYER_USERNAME` and `BUYER_PASSWORD` are
 required; the rest have defaults. A missing variable fails fast with a message
 naming it.
+
+`ALTCHA_ENABLED` is off unless set to `true`. When it is false or unset, login
+requests omit the captcha field and `API-AUTH-08..10` are not collected.

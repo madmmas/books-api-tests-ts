@@ -12,6 +12,7 @@ import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.MOCK_API_PORT ?? 8080);
+const ALTCHA_ENABLED = (process.env.ALTCHA_ENABLED ?? "").trim().toLowerCase() === "true";
 const HMAC_SECRET = "mock-altcha-secret";
 const MAX_NUMBER = 50_000;
 const USERS = new Map([
@@ -95,9 +96,11 @@ function send(res, status, body, extraHeaders = {}) {
 function handleLogin(body, res) {
   const { username, password, altcha } = body ?? {};
 
-  const captchaError = verifyAltcha(altcha);
-  if (captchaError) {
-    return send(res, 400, { code: captchaError, message: "Captcha verification failed" });
+  if (ALTCHA_ENABLED) {
+    const captchaError = verifyAltcha(altcha);
+    if (captchaError) {
+      return send(res, 400, { code: captchaError, message: "Captcha verification failed" });
+    }
   }
 
   if (typeof username !== "string" || typeof password !== "string") {

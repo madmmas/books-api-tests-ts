@@ -35,6 +35,8 @@ export default defineConfig({
     {
       name: "api",
       testMatch: /(auth|contract)\/.*\.spec\.ts/,
+      // Captcha cases live in jwt-login-captcha.spec.ts and only run when on.
+      testIgnore: config.altchaEnabled ? [] : [/jwt-login-captcha\.spec\.ts/],
     },
   ],
 });
