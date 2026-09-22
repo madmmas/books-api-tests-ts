@@ -1,0 +1,53 @@
+openapi: 3.1.0
+info:
+  title: Books Library public REST
+  version: 1.0.0
+  description: >
+    Trimmed copy of the published Books Library spec, containing only the paths
+    this test suite exercises. CredentialsBody and /auth/jwt/login are copied
+    verbatim from the team's generated spec. /health is documented here by the
+    SDET team (see README, "Known spec gaps") and must be confirmed by backend.
+servers:
+  - url: http://localhost:8080
+    description: Kong (when gateway is on)
+  - url: http://localhost:3000
+    description: Local development (when gateway is off)
+components:
+  schemas:
+    CredentialsBody:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+        altcha:
+          type: string
+      required:
+        - username
+        - password
+  parameters: {}
+paths:
+  /health:
+    get:
+      summary: Liveness and readiness probe
+      responses:
+        "200":
+          description: Service is up
+  /auth/jwt/login:
+    post:
+      summary: Public JWT login (Altcha required)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialsBody"
+      responses:
+        "200":
+          description: User and tokens
+        "400":
+          description: Validation error
+webhooks: {}

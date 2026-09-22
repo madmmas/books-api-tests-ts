@@ -1,0 +1,71 @@
+name: API tests
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 9 * * *" # 02:00 America/Vancouver
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: Typecheck and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+
+  api-tests:
+    name: API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: static-checks
+    env:
+      API_BASE_URL: ${{ vars.API_BASE_URL }}
+      TEST_ENV: ci
+      BUYER_USERNAME: ${{ secrets.BUYER_USERNAME }}
+      BUYER_PASSWORD: ${{ secrets.BUYER_PASSWORD }}
+      ALTCHA_CHALLENGE_PATH: ${{ vars.ALTCHA_CHALLENGE_PATH }}
+      OPENAPI_SPEC: ./openapi/books-api.yaml
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      # Fail in seconds if the environment is down, rather than letting every
+      # auth test time out in turn.
+      - name: Health check
+        run: npm run test:health
+
+      - name: Security tests (no retries)
+        run: npm run test:security
+
+      - name: Full suite
+        run: npx playwright test
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            playwright-report/
+            results/junit.xml
+          retention-days: 14

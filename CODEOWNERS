@@ -1,0 +1,3 @@
+# SDETs own the test suite. Any change here needs their review.
+*           @books/sdet
+/openapi/   @books/sdet @books/backend

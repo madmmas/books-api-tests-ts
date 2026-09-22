@@ -1,0 +1,41 @@
+{
+  "name": "books-api-tests-ts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API test suite for the Books Library public REST API",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "playwright test",
+    "test:health": "playwright test --grep @health",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:security": "playwright test --grep @security --retries=0",
+    "test:repeat": "playwright test --repeat-each=5",
+    "report": "playwright show-report",
+    "mock-api": "node tools/mock-api/server.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run format:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.49.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-playwright": "^2.1.0",
+    "js-yaml": "^4.1.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1",
+    "zod": "^3.24.1"
+  }
+}
