@@ -41,11 +41,12 @@ npm run mock-api &      # listens on http://localhost:8080
 npm test                # captcha tests run only when ALTCHA_ENABLED=true
 ```
 
-To exercise captcha against the mock, start both sides with the flag on:
+To exercise captcha against the mock, set `ALTCHA_ENABLED=true` in `.env`
+and start both sides:
 
 ```bash
-ALTCHA_ENABLED=true npm run mock-api &
-ALTCHA_ENABLED=true npm test
+npm run mock-api &
+npm test
 ```
 
 **A green run against the mock proves the harness works and nothing about the
@@ -153,9 +154,12 @@ Each is visible in the suite rather than worked around.
 
 ## Environment variables
 
-See `.env.example`. `API_BASE_URL`, `BUYER_USERNAME` and `BUYER_PASSWORD` are
-required; the rest have defaults. A missing variable fails fast with a message
-naming it.
+See `.env.example`. Copy it to `.env` for local runs; `src/config.ts` loads
+that file at import time. Variables already set in the process (CI, the shell)
+are not overwritten.
+
+`API_BASE_URL`, `BUYER_USERNAME` and `BUYER_PASSWORD` are required; the rest
+have defaults. A missing variable fails fast with a message naming it.
 
 `ALTCHA_ENABLED` is off unless set to `true`. When it is false or unset, login
 requests omit the captcha field and `API-AUTH-08..10` are not collected.

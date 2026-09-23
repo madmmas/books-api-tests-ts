@@ -3,7 +3,18 @@
  *
  * A missing or malformed variable fails immediately with a message that names
  * the variable, instead of surfacing later as a confusing test failure.
+ *
+ * `.env` is loaded here so Playwright, clients, and tests all see the same
+ * values. Variables already set in the process (CI, the shell) win.
  */
+
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+
+const envPath = resolve(import.meta.dirname, "..", ".env");
+if (existsSync(envPath)) {
+  process.loadEnvFile(envPath);
+}
 
 type TestEnv = "local" | "ci" | "staging" | "prod";
 
@@ -56,8 +67,8 @@ export const config = {
    * tests against it, because other suites and other workers share it.
    */
   buyer: {
-    username: required("BUYER_USERNAME", "buyer@example.com"),
-    password: required("BUYER_PASSWORD", "Password123!"),
+    username: required("BUYER_USERNAME", "buyer"),
+    password: required("BUYER_PASSWORD", "Passw0rd!"),
   },
 } as const;
 

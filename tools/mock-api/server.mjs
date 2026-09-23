@@ -9,7 +9,14 @@
  * against a real deployment; the mock is opt-in via `npm run mock-api`.
  */
 import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { existsSync } from "node:fs";
 import { createServer } from "node:http";
+import { resolve } from "node:path";
+
+const envPath = resolve(import.meta.dirname, "..", "..", ".env");
+if (existsSync(envPath)) {
+  process.loadEnvFile(envPath);
+}
 
 const PORT = Number(process.env.MOCK_API_PORT ?? 8080);
 const ALTCHA_ENABLED = (process.env.ALTCHA_ENABLED ?? "").trim().toLowerCase() === "true";
