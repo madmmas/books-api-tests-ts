@@ -51,7 +51,7 @@ function stripTrailingSlash(url: string): string {
 }
 
 export const config = {
-  apiBaseUrl: stripTrailingSlash(required("API_BASE_URL", "http://localhost:8080")),
+  apiBaseUrl: stripTrailingSlash(required("API_BASE_URL", "http://localhost:3003")),
   env: asTestEnv(required("TEST_ENV", "local")),
   /**
    * Captcha is opt-in. Challenges are fetched and the `altcha` field is sent
@@ -66,9 +66,13 @@ export const config = {
    * Treat it as READ-ONLY: never run failed-attempt, lockout or password-change
    * tests against it, because other suites and other workers share it.
    */
-  buyer: {
-    username: required("BUYER_USERNAME", "buyer"),
-    password: required("BUYER_PASSWORD", "Passw0rd!"),
+  // buyer: {
+  //   username: required("buyer"),
+  //   password: required("Passw0rd!"),
+  // },
+    buyer: {
+      username: required("BUYER_USERNAME"),
+      password: required("BUYER_PASSWORD"),
   },
 } as const;
 

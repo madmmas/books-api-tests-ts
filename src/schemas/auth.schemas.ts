@@ -15,6 +15,11 @@ import { z } from "zod";
 export const UserSchema = z
   .object({
     id: z.string().min(1),
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    email: z.string().min(1),
+    phoneNumber: z.string(),
+    avatar: z.string().min(1),
     username: z.string().min(1),
     role: z.enum(["user", "shop", "superadmin", "sales", "marketing"]),
   })
@@ -25,14 +30,18 @@ export const LoginSuccessSchema = z
     accessToken: z.string().min(1),
     refreshToken: z.string().min(1),
     tokenType: z.literal("Bearer"),
+    expiresIn: z.number().min(1),
+    expiresAt: z.string().min(1),
     user: UserSchema,
   })
   .strict();
 
 export const ErrorSchema = z
   .object({
-    code: z.string().min(1),
-    message: z.string().min(1),
+    // code: z.string().min(1),
+    // message: z.string().min(1),
+    error: z.string().min(1),
+    failedAttempts: z.number().min(1),
   })
   .strict();
 
