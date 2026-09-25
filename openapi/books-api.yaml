@@ -52,4 +52,10 @@ paths:
           description: User and tokens
         "400":
           description: Validation error
+        "401":
+          description: Invalid credentials
+        "403":
+          description: Role not allowed on public login
+        "423":
+          description: Account temporarily locked
 webhooks: {}
