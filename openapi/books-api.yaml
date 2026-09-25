@@ -51,7 +51,7 @@ paths:
         "200":
           description: User and tokens
         "400":
-          description: Validation error
+          description: Validation errors
         "401":
           description: Invalid credentials
         "403":
