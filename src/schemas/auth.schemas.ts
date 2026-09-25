@@ -45,6 +45,14 @@ export const ErrorSchema = z
   })
   .strict();
 
+export const AccountLockedResponseSchema = z
+  .object({
+      code: z.enum(["account_locked"]),
+      message: z.string().min(1),
+      retryAfterSeconds: z.number().min(1),
+   })
+  .strict();
+
 export type LoginSuccess = z.infer<typeof LoginSuccessSchema>;
 export type ApiError = z.infer<typeof ErrorSchema>;
 

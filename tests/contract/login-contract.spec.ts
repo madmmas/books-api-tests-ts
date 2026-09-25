@@ -72,7 +72,7 @@ test.describe("Login contract", () => {
    * Tracked in README, "Known spec gaps".
    */
   test("API-CONTRACT-05 the 401 response status is documented", async ({ auth }) => {
-    test.fail(true, "Spec gap: 401 is not documented for /auth/jwt/login yet");
+    test.fixme(true, "Spec gap: 401 is not documented for /auth/jwt/login yet");
 
     // Act
     const res = await auth.login(config.buyer.username, "definitely-not-it");
